@@ -92,12 +92,33 @@ function approve($userid, $username, $type) {
   }
 }
 
-// On deny, simply add to default OOC group
-function deny($userid) {
+// On deny, simply add to default OOC group & send pm
+function deny($userid, $username) {
   global $mybb, $db, $cache;
   $group = new UserGroup($mybb, $db, $cache);
   $group->initialize(Groups::MEMBER);
   $group->add_member($userid);
+
+  if(!empty($mybb->settings['rpgsuite_approval_denypm'])) {
+    $pm_handler = new PMDataHandler();
+    $pm_handler->admin_override = true;
+    $pm = array(
+        "subject" => $mybb->settings['rpgsuite_approval_denypm_subj'],
+        "message" => $mybb->settings['rpgsuite_approval_denypm'],
+      "fromid" => Accounts::ADMIN,
+      "options" => array(
+        "savecopy" => "0"),
+      );
+    $pm['to'] = array($username);
+    $pm_handler->set_data($pm);
+
+    if(!$pm_handler->validate_pm())
+    {
+       //bad pm. oops. lol
+    } else {
+       $pm_handler->insert_pm();
+    }
+  }
 }
 
 $plugins->add_hook('global_start', 'display_queue');
@@ -129,7 +150,7 @@ function queue_details() {
         if(isset($mybb->input['approve'])) {
           approve($userid, $username, $type);
         } else if(isset($mybb->input['deny'])) {
-          deny($userid);
+          deny($userid, $username);
         }
       }
       add_breadcrumb('Approve New Members');

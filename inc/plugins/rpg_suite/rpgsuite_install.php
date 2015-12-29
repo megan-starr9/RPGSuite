@@ -63,8 +63,22 @@ function rpgsuite_uninstall() {
 Activate Plugin
 */
 function rpgsuite_activate() {
+  global $db;
+
   reverse_template_edits();
   apply_template_edits();
+
+  // If we have new settings, add them!
+  $settinggroup = $db->simple_select('settinggroups','gid','name = \'rpgsuite\'');
+  $group = $db->fetch_array($settinggroup);
+  $settings = build_settings($group['gid']);
+  foreach($settings as $setting) {
+    $settingquery = $db->simple_select('settings','sid','name = \''.$setting['name'].'\'');
+    if(!$settingquery->num_rows) {
+      $db->insert_query('settings', $setting);
+    }
+	}
+	rebuild_settings();
 }
 
 /**

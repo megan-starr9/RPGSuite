@@ -142,5 +142,19 @@ function settings() {
     'type'    => 'textarea',
     'default'        => ''
   );
+  $settingarray[] = array(
+    'name'        => 'approval_denypm_subj',
+    'title'            => 'Deny PM Subject',
+    'description'    => 'Subject of PM sent after account is denied.',
+    'type'    => 'text',
+    'default'        => ''
+  );
+  $settingarray[] = array(
+    'name'        => 'approval_denypm',
+    'title'            => 'Deny PM',
+    'description'    => 'Contents of PM sent right after account is denied - leave empty to disable.',
+    'type'    => 'textarea',
+    'default'        => ''
+  );
   return $settingarray;
 }
