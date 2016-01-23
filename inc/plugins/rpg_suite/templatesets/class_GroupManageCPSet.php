@@ -148,7 +148,11 @@ class GroupManageCPSet extends TemplateSet {
     $templatearray[] = new Template('user_manage_row',
     '<tr class="{$user_row}">
     <td>{$user[\'username\']}</td>
-    <td>{$memberoptions}</td>
+    <td>{$memberoptions}
+      <div style="float: left;width:200px;">
+        Remove Member <input type="checkbox" name="delete_member[]" value="{$user[\'uid\']}" \>
+      </div>
+    </td>
     </tr>');
     // Create Setting Bit
     $templatearray[] = new Template('user_manage_setting',

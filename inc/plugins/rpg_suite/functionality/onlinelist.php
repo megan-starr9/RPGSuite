@@ -23,6 +23,9 @@ function update_location(&$plugin_array) {
   else if($urlarr['action'] == 'threadlog') {
     $plugin_array['location_name'] = threadlog_bit($urlarr['amp;uid']);
   }
+	else if($urlarr['action'] == 'lonelythreads') {
+    $plugin_array['location_name'] = "<a href='".$plugin_array['user_activity']['location']."'>Viewing Lonely Threads</a>";
+  }
 }
 
 function rankview_bit($gid) {

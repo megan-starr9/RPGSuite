@@ -18,7 +18,7 @@ if(isset($templatelist)) {
 }
 if(THIS_SCRIPT == 'misc.php') {
 	//Threadlog
-	$templatelist .= "rpgthreadlog_nothreads,rpgthreadlog_page,rpgthreadlog_row,";
+	$templatelist .= "rpgthreadlog_nothreads,rpgthreadlog_page,rpgthreadlog_row,rpglonelythread_page,rpglonelythread_row";
 } else if(THIS_SCRIPT == 'index.php') {
 	//Show Ranks & Activation Queue
 	$templatelist .= "rpggroupview_noranks_full,rpggroupview_noranks_user,rpggroupview_ranks_emptyuser,";
@@ -70,6 +70,7 @@ if (defined("IN_ADMINCP")) {
 	require_once MYBB_ROOT."inc/plugins/rpg_suite/functionality/onlinelist.php";
 	require_once MYBB_ROOT."inc/plugins/rpg_suite/functionality/forumdisplay.php";
 	require_once MYBB_ROOT."inc/plugins/rpg_suite/functionality/welcomewagon.php";
+		require_once MYBB_ROOT."inc/plugins/rpg_suite/functionality/lonelythreads.php";
 }
 
 // Load general files (used anywhere)

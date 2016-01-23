@@ -103,6 +103,30 @@ class RPGSuite {
   }
 
   /**
+  Get Lonely Threads
+  */
+  public function get_lonely_threads($pack = -1) {
+    $filter = '';
+    if($pack == 0) {
+      $filter = ' AND NOT EXISTS (SELECT 1 FROM '.TABLE_PREFIX.'icgroups i WHERE f.fid = i.fid)';
+    } else if($pack > 0) {
+      $filter = ' AND EXISTS (SELECT 1 FROM '.TABLE_PREFIX.'icgroups i WHERE i.gid = '.$pack.' AND f.fid = i.fid)';
+    }
+    
+    $threadquery = $this->db->simple_select('threads t INNER JOIN '.TABLE_PREFIX.'forums f ON t.fid = f.fid INNER JOIN '.TABLE_PREFIX.'threadprefixes p ON t.prefix = p.pid',
+          '*','f.active = 1 AND f.open = 1 AND f.icforum = 1 AND t.closed = 0 AND t.visible = 1 AND t.replies = 0'.$filter,
+          array(
+            "order_by" => 'dateline',
+            "order_dir" => 'DESC'
+          ));
+    $threads = array();
+    while($thread = $this->db->fetch_array($threadquery)) {
+      $threads[] = $thread;
+    }
+    return $threads;
+  }
+
+  /**
   Function used to turn settings into form
   */
   public function parse_setting($setting, $value, $id = "") {
@@ -186,13 +210,16 @@ class RPGSuite {
 
     // Set permissions on other MO forums to noread
     $mopermissions = Creation::FORUM_PERM_NOREAD;
+    $mopermissions['gid'] = $gid;
     foreach($othergroups as $othergroup) {
       if(!empty($othergroup['mo_fid'])) {
         $mopermissions['fid'] = $othergroup['mo_fid'];
-        $mopermissions['gid'] = $gid;
         $this->db->insert_query('forumpermissions',$mopermissions);
       }
     }
+    // Set staff forums to noread
+    $mopermissions['fid'] = Forums::STAFFCATEGORY;
+    $this->db->insert_query('forumpermissions', $mopermissions);
 
     $fid = $mofid = 0;
     if(!empty($settings['region'])) {
@@ -375,7 +402,7 @@ class RPGSuite {
   */
   public function get_default_ranktable() {
     $usergroup = new UserGroup($this->mybb, $this->db, $this->cache, array('gid' => '0'));
-    return $usergroup->get_ranks();
+    return $usergroup->get_ranks(1);
   }
 
 }

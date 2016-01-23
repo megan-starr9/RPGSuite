@@ -79,6 +79,12 @@ function rpgsuite_activate() {
     }
 	}
 	rebuild_settings();
+
+  // If we have new templates, add them, but only if they exist!
+  // Lonely Thread Templates
+  require_once MYBB_ROOT."/inc/plugins/rpg_suite/templatesets/class_LonelyThreadSet.php";
+  $templateset = new LonelyThreadSet($db);
+  $templateset->create();
 }
 
 /**
@@ -189,6 +195,9 @@ function create_templates() {
   // Misc Templates
   require_once MYBB_ROOT."/inc/plugins/rpg_suite/templatesets/class_MiscSet.php";
   $templatesets[] = new MiscSet($db);
+  // Lonely Thread Templates
+  require_once MYBB_ROOT."/inc/plugins/rpg_suite/templatesets/class_LonelyThreadSet.php";
+  $templatesets[] = new LonelyThreadSet($db);
 
   foreach($templatesets as $templateset) {
     $templateset->destroy(); // make sure it's not there first!
@@ -223,6 +232,9 @@ function destroy_templates() {
   // Misc Templates
   require_once MYBB_ROOT."/inc/plugins/rpg_suite/templatesets/class_MiscSet.php";
   $templatesets[] = new MiscSet($db);
+  // Lonely Thread Templates
+  require_once MYBB_ROOT."/inc/plugins/rpg_suite/templatesets/class_LonelyThreadSet.php";
+  $templatesets[] = new LonelyThreadSet($db);
 
 
   foreach($templatesets as $templateset) {

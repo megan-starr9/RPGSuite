@@ -16,22 +16,29 @@ abstract class TemplateSet {
   }
 
   public function create() {
-    $templategroup = array(
-  		'prefix' => $this::SET_PREFIX,
-  		'title'  => $this::SET_TITLE,
-  		'isdefault' => 1
-  	);
-  	$this->db->insert_query("templategroups", $templategroup);
+
+    $tgroup = $this->db->simple_select('templategroups', '*', 'prefix = \''.$this::SET_PREFIX.'\'');
+    if(!$tgroup->num_rows) {
+      $templategroup = array(
+    		'prefix' => $this::SET_PREFIX,
+    		'title'  => $this::SET_TITLE,
+    		'isdefault' => 1
+    	);
+    	$this->db->insert_query("templategroups", $templategroup);
+    }
 
     foreach($this->build_templates() as $template) {
-      $array = array(
-    			"title" 	=> $this::SET_PREFIX.'_'.$template->getName(),
-    			"template"	=> $this->db->escape_string($template->getContents()),
-    			"sid"		=> -2,
-    			"version"	=> 1.0,
-    			"dateline"	=> TIME_NOW
-    		);
-      $this->db->insert_query('templates', $array);
+      $temp = $this->db->simple_select('templates', '*', 'title = \''.$this::SET_PREFIX.'_'.$template->getName().'\'');
+      if(!$temp->num_rows) {
+        $array = array(
+      			"title" 	=> $this::SET_PREFIX.'_'.$template->getName(),
+      			"template"	=> $this->db->escape_string($template->getContents()),
+      			"sid"		=> -2,
+      			"version"	=> 1.0,
+      			"dateline"	=> TIME_NOW
+      		);
+        $this->db->insert_query('templates', $array);
+      }
     }
   }
 

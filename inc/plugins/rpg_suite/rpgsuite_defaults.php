@@ -23,10 +23,14 @@ class Accounts {
   const ADMIN = 1;
 }
 
+class Forums {
+  const STAFFCATEGORY = 79;
+}
+
 class Stats {
   const YOUTHCAP = 6;
   const ADULTCAP = 12;
-  const ADULTAGE = 9*30; // 9 months!
+  const ADULTAGE = 9; // 9 months
   const PERCENTAGE = 2/3; // percentage where color changes!
 }
 

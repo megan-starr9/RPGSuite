@@ -38,7 +38,11 @@ function load_groupcp() {
     if($usergroup->initialize($gid)) {
       $group = $usergroup->get_info();
       if(handle_form($usergroup)) {
-        redirect("", "Your pack settings were successfully updated.");
+        $url = "modcp.php?action=managegroup&gid=".$gid;
+        if($mybb->input['section']) {
+          $url .= "&section=".$mybb->input['section'];
+        }
+        redirect($url, "Your pack settings were successfully updated.");
       }
       if($mybb->input['section'] == 'groupoptions') {
         $title = 'Manage Options';
@@ -190,18 +194,22 @@ function handle_form($usergroup) {
   if(isset($mybb->input['member_update'])) {
     foreach($usergroup->get_members() as $member) {
       $user = $member->get_info();
-      foreach($member->get_settings_mod() as $setting) {
-        $inputid = $setting['name'].'u'.$user['uid'];
-        if(isset($mybb->input[$inputid])) {
-          if($setting['name'] == 'group_dateline') {
-            // Handle datetime
-            $userchanges[$setting['name']] = strtotime($mybb->input[$inputid]);
-          } else {
-          $userchanges[$setting['name']] = $db->escape_string($mybb->input[$inputid]);
+      if(is_array($mybb->input['delete_member']) && in_array($user['uid'], $mybb->input['delete_member'])) {
+        $usergroup->remove_member($user['uid']);
+      } else {
+        foreach($member->get_settings_mod() as $setting) {
+          $inputid = $setting['name'].'u'.$user['uid'];
+          if(isset($mybb->input[$inputid])) {
+            if($setting['name'] == 'group_dateline') {
+              // Handle datetime
+              $userchanges[$setting['name']] = strtotime($mybb->input[$inputid]);
+            } else {
+            $userchanges[$setting['name']] = $db->escape_string($mybb->input[$inputid]);
+          }
+          }
         }
-        }
+        $member->update_member($userchanges);
       }
-      $member->update_member($userchanges);
       $update = true;
     }
   } else if(isset($mybb->input['member_add'])) {

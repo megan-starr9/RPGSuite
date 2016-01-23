@@ -57,10 +57,10 @@ function build_row($usergroup, $rowcount) {
     }
 
     // Adults are 9 months of age
-    $adultage = Stats::ADULTAGE;
+    $adultdate = strtotime('-'.Stats::ADULTAGE.' month');
     $age = $user[Fields::AGE] * 365;
-    $age_calc = (!empty($user[Fields::BDATE]) && strtotime($user[Fields::BDATE])) ? (time() - strtotime($user[Fields::BDATE])) / 86400 : $user[Fields::AGE] * 365;
-    if(($age > $adultage || $age_calc > $adultage) && !$rank['ignoreactivitycheck']) {
+    $dob = (!empty($user[Fields::BDATE]) && strtotime($user[Fields::BDATE])) ? strtotime($user[Fields::BDATE]) : strtotime('-'.$user[Fields::AGE].' years');
+    if(($dob < $adultdate || ($age > (time() - $adultdate) / 86000)) && !$rank['ignoreactivitycheck']) {
       $adultcount++;
     } else if(!$rank['ignoreactivitycheck']){
       $youthcount++;
