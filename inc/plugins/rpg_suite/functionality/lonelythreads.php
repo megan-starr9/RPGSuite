@@ -14,7 +14,7 @@ Functionality behind the lonely thread list
 $plugins->add_hook('misc_start', 'lonelythread_init');
 
 function lonelythread_init() {
-  global $mybb, $db, $cache, $templates, $threadpage, $header, $headerinclude, $footer;
+  global $mybb, $db, $cache, $templates, $threadpage, $header, $headerinclude, $footer, $theme;
 
   if($mybb->get_input('action') == 'lonelythreads') {
     $rpgsuite = new RPGSuite($mybb, $db, $cache);

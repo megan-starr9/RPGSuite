@@ -56,7 +56,7 @@ class LonelyThreadSet extends TemplateSet {
     $templatearray[] = new Template('groupfilter_nogroup',
     '<a href="misc.php?action=lonelythreads">View All</a> &middot; <a href="misc.php?action=lonelythreads&gid=0">Neutral Ground</a>');
     $templatearray[] = new Template('groupfilter_group',
-    ' &middot; <a href="misc.php?action=lonelythreads&gid={$group[\'gid\']}">{$group[\'title\']}</a>');
+    ' &middot; <a href="misc.php?action=lonelythreads&gid={$groupinfo[\'gid\']}">{$groupinfo[\'title\']}</a>');
 
     return $templatearray;
   }
