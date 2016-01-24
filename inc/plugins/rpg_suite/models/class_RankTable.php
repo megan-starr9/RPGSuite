@@ -88,10 +88,25 @@ class RankTable {
   public function get_members($rankid = null) {
     if(isset($rankid)) {
       $memberarray = array();
-      foreach($this->members as $member) {
-        $memberinfo = $member->get_info();
-        if($memberinfo['grouprank'] == $rankid) {
-          $memberarray[] = $member;
+      // If we are getting those unranked, also mark those with invalid ranks as unranked
+      if($rankid == 0) {
+        $groupranks = array();
+        foreach($this->ranks as $rank) {
+          $groupranks[] = $rank['id'];
+        }
+        foreach($this->members as $member) {
+          $memberinfo = $member->get_info();
+          if(!in_array($memberinfo['grouprank'], $groupranks)) {
+            $memberarray[] = $member;
+          }
+        }
+      } else {
+        // Now add members to rank-based array
+        foreach($this->members as $member) {
+          $memberinfo = $member->get_info();
+          if($memberinfo['grouprank'] == $rankid) {
+            $memberarray[] = $member;
+          }
         }
       }
       return $memberarray;
