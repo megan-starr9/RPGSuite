@@ -73,7 +73,24 @@ class GroupMember {
       $rankopts = array(
         0 => 'None'
       );
-      $query = $this->db->simple_select('groupranks', '*', 'exists(select 1 from '.TABLE_PREFIX.'grouptiers t where t.gid = 0 and tid = t.id)', array(
+
+      // get current group
+      $gid = $this->info['displaygroup'];
+
+      // see if current group has any custom tiers
+      $i = 0;
+      $query = $this->db->simple_select('grouptiers', '*', 'gid = '. $gid);
+      while($tier = $query->fetch_assoc()) {
+        $i++;
+      }
+
+      // set to zero if there are no custom tiers
+      if ($i == 0) {
+        $gid = 0;
+      }
+
+      // print select options for this group
+      $query = $this->db->simple_select('groupranks', '*', 'exists(select 1 from '.TABLE_PREFIX.'grouptiers t where t.gid = '. $gid .' and tid = t.id)', array(
         "order_by" => 'seq',
         "order_dir" => 'ASC'));
         $options = '<option value="0">None</option>';
