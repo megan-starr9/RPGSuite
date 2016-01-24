@@ -44,6 +44,9 @@ $page->add_breadcrumb_item('Manage Packs','index.php?module=rpgsuite-groups');
 			'link' => "index.php?module=rpgsuite-group&amp;action=relocate&amp;gid=".$group['gid'],
 			'description' => "Relocate to another territory."
 		);
+		
+		// define this variable so our forms get updated
+		$ranktable = $usergroup->get_ranks(1);
 
 		// FIRST let's handle any submits....
 		if($mybb->request_method == "post") {
