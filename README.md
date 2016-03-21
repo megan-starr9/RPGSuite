@@ -7,6 +7,7 @@ Organizing & optimizing as I go <3
 Known bugs
 
 ---> Group Points calls wrong function & doesn't work
+
 ---> Custom rank functionality is not completed
 
 
