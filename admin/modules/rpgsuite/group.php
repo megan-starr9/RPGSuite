@@ -44,7 +44,7 @@ $page->add_breadcrumb_item('Manage Packs','index.php?module=rpgsuite-groups');
 			'link' => "index.php?module=rpgsuite-group&amp;action=relocate&amp;gid=".$group['gid'],
 			'description' => "Relocate to another territory."
 		);
-		
+
 		// define this variable so our forms get updated
 		$ranktable = $usergroup->get_ranks(1);
 
@@ -120,7 +120,7 @@ $page->add_breadcrumb_item('Manage Packs','index.php?module=rpgsuite-groups');
 					$ranktable->update_rank($createrank);
 				}
 				flash_message("Ranks successfully updated!", "success");
-				admin_redirect("");
+				admin_redirect("index.php?module=rpgsuite-group&action=ranks&gid=".$group['gid']);
 			}  else if($mybb->input['action'] == 'members') {
 				if($mybb->input['perform'] == 'remove') {
 					$usergroup->remove_member((int)$mybb->input['uid']);

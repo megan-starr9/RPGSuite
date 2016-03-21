@@ -68,6 +68,10 @@ function rpgsuite_activate() {
   reverse_template_edits();
   apply_template_edits();
 
+  // Add any tables for upgrading
+  if(!$db->table_exists("otms"))
+    $db->write_query("CREATE TABLE ".TABLE_PREFIX."otms (id int(11) NOT NULL AUTO_INCREMENT, name VARCHAR(500), type VARCHAR(100), value VARCHAR(2000), PRIMARY KEY(id))");
+
   // If we have new settings, add them!
   $settinggroup = $db->simple_select('settinggroups','gid','name = \'rpgsuite\'');
   $group = $db->fetch_array($settinggroup);
@@ -84,6 +88,10 @@ function rpgsuite_activate() {
   // Lonely Thread Templates
   require_once MYBB_ROOT."/inc/plugins/rpg_suite/templatesets/class_LonelyThreadSet.php";
   $templateset = new LonelyThreadSet($db);
+  $templateset->create();
+  // OTM Templates
+  require_once MYBB_ROOT."/inc/plugins/rpg_suite/templatesets/class_OtmSet.php";
+  $templateset = new OtmSet($db);
   $templateset->create();
 }
 
@@ -131,6 +139,7 @@ function create_tables() {
   $db->write_query('CREATE TABLE '.TABLE_PREFIX.'groupfield_values (gid INT(11))');
   $db->write_query("CREATE TABLE ".TABLE_PREFIX."groupranks (id int(11) NOT NULL AUTO_INCREMENT, seq int(11) NOT NULL DEFAULT '0', tid int(11) NOT NULL DEFAULT '0', label varchar(200), visible int(1) NOT NULL DEFAULT '1', split_dups int(1) NOT NULL DEFAULT '1', dups int(11) NOT NULL DEFAULT '1', ignoreactivitycheck int(1) NOT NULL DEFAULT 0, PRIMARY KEY(id))");
   $db->write_query("CREATE TABLE ".TABLE_PREFIX."grouptiers (id int(11) NOT NULL AUTO_INCREMENT, seq int(11) NOT NULL DEFAULT '0', label varchar(200), gid int(11) NOT NULL DEFAULT 0, PRIMARY KEY(id))");
+  $db->write_query("CREATE TABLE ".TABLE_PREFIX."otms (id int(11) NOT NULL AUTO_INCREMENT, name VARCHAR(500), type VARCHAR(100), value VARCHAR(2000), PRIMARY KEY(id))");
 
   //Add Columns
   $db->write_query("ALTER TABLE `".TABLE_PREFIX."forums` ADD COLUMN `icforum` INT(1) NOT NULL DEFAULT '0'");
@@ -153,6 +162,7 @@ function destroy_tables() {
   $db->write_query("DROP TABLE IF EXISTS ".TABLE_PREFIX."groupfield_values");
   $db->write_query("DROP TABLE IF EXISTS ".TABLE_PREFIX."groupranks");
   $db->write_query("DROP TABLE IF EXISTS ".TABLE_PREFIX."grouptiers");
+  $db->write_query("DROP TABLE IF EXISTS ".TABLE_PREFIX."otms");
 
   //Delete columns
   if($db->field_exists("icforum", "forums"))
@@ -198,6 +208,9 @@ function create_templates() {
   // Lonely Thread Templates
   require_once MYBB_ROOT."/inc/plugins/rpg_suite/templatesets/class_LonelyThreadSet.php";
   $templatesets[] = new LonelyThreadSet($db);
+  // OTM Templates
+  require_once MYBB_ROOT."/inc/plugins/rpg_suite/templatesets/class_OtmSet.php";
+  $templatesets[] = new OtmSet($db);
 
   foreach($templatesets as $templateset) {
     $templateset->destroy(); // make sure it's not there first!
@@ -235,6 +248,9 @@ function destroy_templates() {
   // Lonely Thread Templates
   require_once MYBB_ROOT."/inc/plugins/rpg_suite/templatesets/class_LonelyThreadSet.php";
   $templatesets[] = new LonelyThreadSet($db);
+  // OTM Templates
+  require_once MYBB_ROOT."/inc/plugins/rpg_suite/templatesets/class_OtmSet.php";
+  $templatesets[] = new OtmSet($db);
 
 
   foreach($templatesets as $templateset) {

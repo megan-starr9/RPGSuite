@@ -36,11 +36,13 @@ class RPGSuite {
       return $this->icgroups;
     }
     $icgrouparray = array();
-    $query = $this->db->simple_select('usergroups u inner join '.TABLE_PREFIX.'icgroups i on u.gid = i.gid','*, u.gid', $criteria,
+    /*$query = $this->db->simple_select('usergroups u inner join '.TABLE_PREFIX.'icgroups i on u.gid = i.gid','*, u.gid', $criteria,
         array(
-          "order_by" => 'hasranks',
+          "order_by" => 'hasranks, title',
           "order_dir" => 'DESC'
-        ));
+        ));*/
+    $query = $this->db->query('SELECT *, u.gid FROM '.TABLE_PREFIX.'usergroups u INNER JOIN '.TABLE_PREFIX.'icgroups i
+            ON u.gid = i.gid WHERE '.$criteria.' ORDER BY hasranks DESC, title ASC');
     while($icgroup = $this->db->fetch_array($query)) {
       $icgrouparray[$icgroup['gid']] = new UserGroup($this->mybb, $this->db, $this->cache, $icgroup);
     }
@@ -57,11 +59,13 @@ class RPGSuite {
       return $this->icgroups_withmembers;
     }
     $icgrouparray = array();
-    $query = $this->db->simple_select('usergroups u inner join '.TABLE_PREFIX.'icgroups i on u.gid = i.gid','*, u.gid', $groupcriteria,
+    /*$query = $this->db->simple_select('usergroups u inner join '.TABLE_PREFIX.'icgroups i on u.gid = i.gid','*, u.gid', $groupcriteria,
         array(
-          "order_by" => 'hasranks',
+          "order_by" => 'hasranks, title',
           "order_dir" => 'DESC'
-        ));
+        ));*/
+    $query = $this->db->query('SELECT *, u.gid FROM '.TABLE_PREFIX.'usergroups u INNER JOIN '.TABLE_PREFIX.'icgroups i
+            ON u.gid = i.gid WHERE '.$groupcriteria.' ORDER BY hasranks DESC, title ASC');
     while($icgroup = $this->db->fetch_array($query)) {
       $icgrouparray[$icgroup['gid']] = new UserGroup($this->mybb, $this->db, $this->cache, $icgroup);
     }
@@ -112,7 +116,7 @@ class RPGSuite {
     } else if($pack > 0) {
       $filter = ' AND EXISTS (SELECT 1 FROM '.TABLE_PREFIX.'icgroups i WHERE i.gid = '.$pack.' AND f.fid = i.fid)';
     }
-    
+
     $threadquery = $this->db->simple_select('threads t INNER JOIN '.TABLE_PREFIX.'forums f ON t.fid = f.fid INNER JOIN '.TABLE_PREFIX.'threadprefixes p ON t.prefix = p.pid',
           '*','f.active = 1 AND f.open = 1 AND f.icforum = 1 AND t.closed = 0 AND t.visible = 1 AND t.replies = 0'.$filter,
           array(
@@ -218,8 +222,18 @@ class RPGSuite {
       }
     }
     // Set staff forums to noread
-    $mopermissions['fid'] = Forums::STAFFCATEGORY;
-    $this->db->insert_query('forumpermissions', $mopermissions);
+    foreach(Forums::NOREAD as $locked) {
+      $mopermissions['fid'] = $locked;
+      $this->db->insert_query('forumpermissions', $mopermissions);
+    }
+
+    // Set nowrite forums
+    $ropermissions = Creation::FORUM_PERM_NOWRITE;
+    $ropermissions['gid'] = $gid;
+    foreach(Forums::READONLY as $ro_fid) {
+      $ropermissions['fid'] = $ro_fid;
+      $this->db->insert_query('forumpermissions', $ropermissions);
+    }
 
     $fid = $mofid = 0;
     if(!empty($settings['region'])) {
@@ -257,6 +271,7 @@ class RPGSuite {
     }
 
     $this->cache->update_usergroups();
+    $this->cache->update_forumpermissions();
   }
 
   /**
@@ -297,12 +312,22 @@ class RPGSuite {
     //Move existing prefixed threads to new board
     $threadquery = $this->db->simple_select('threads', '*', 'fid = '.$forum['pid'].' AND prefix = '.$settings['prefix']);
     while($thread = $this->db->fetch_array($threadquery)) {
-      $threadstring .= $thread['tid'];
+      $threadstring .= $thread['tid'].',';
     }
+    $threadstring = rtrim($threadstring, ',');
     if(!empty($threadstring)) {
       $this->db->update_query('threads', array('fid' => $fid), 'tid IN ('.$threadstring.')');
       $this->db->update_query('posts', array('fid' => $fid), 'tid IN ('.$threadstring.')');
       update_forum_lastpost($fid);
+    }
+
+    // Setup moderator tools on IC forum
+    foreach(Forums::MODTOOLS as $tool) {
+      $toolforumquery = $this->db->simple_select('modtools', '*', 'tid = '.$tool);
+      while($tinfo = $this->db->fetch_array($toolforumquery)) {
+        $forums = $tinfo['forums'].',';
+      }
+      $this->db->update_query('modtools', array('forums' => $forums.','.$fid), 'tid = '.$tool);
     }
 
     $moid = 0;

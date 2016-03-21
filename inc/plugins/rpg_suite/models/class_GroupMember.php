@@ -80,12 +80,8 @@ class GroupMember {
       // see if current group has any custom tiers
       $i = 0;
       $query = $this->db->simple_select('grouptiers', '*', 'gid = '. $gid);
-      while($tier = $query->fetch_assoc()) {
-        $i++;
-      }
-
       // set to zero if there are no custom tiers
-      if ($i == 0) {
+      if (!$query->num_rows) {
         $gid = 0;
       }
 
@@ -118,7 +114,7 @@ class GroupMember {
   }
 
   public function get_last_icpost() {
-    $query = $this->db->query('select p.* from '.TABLE_PREFIX.'posts p where uid = '.$this->info['uid'].'
+    $query = $this->db->query('select p.* from '.TABLE_PREFIX.'posts p where uid = '.$this->info['uid'].' and p.visible = 1
                     and exists(select 1 from '.TABLE_PREFIX.'forums f WHERE f.icforum = 1 and f.fid = p.fid) ORDER BY p.dateline DESC LIMIT 1');
     return $query->fetch_array();
   }

@@ -14,7 +14,8 @@ function rpgsuite_meta()
 	$sub_menu['10'] = array("id" => "groups", "title" => "Manage Packs", "link" => "index.php?module=rpgsuite-groups");
 	$sub_menu['20'] = array("id" => "ranks", "title" => "Manage Default Ranks", "link" => "index.php?module=rpgsuite-ranks");
 	$sub_menu['40'] = array("id" => "groupfields", "title" => "Manage Custom Pack Fields", "link" => "index.php?module=rpgsuite-groupfields");
-	$sub_menu['60'] = array("id" => "create", "title" => "Create Pack", "link" => "index.php?module=rpgsuite-create");
+	$sub_menu['60'] = array("id" => "otms", "title" => "Manage Awards/Otms", "link" => "index.php?module=rpgsuite-otms");
+	$sub_menu['80'] = array("id" => "create", "title" => "Create Pack", "link" => "index.php?module=rpgsuite-create");
 	$sub_menu = $plugins->run_hooks("admin_rpgsuite_menu", $sub_menu);
 
 	$page->add_menu_item('Pack Management', "rpgsuite", "index.php?module=rpgsuite", 100, $sub_menu);
@@ -33,6 +34,7 @@ function rpgsuite_action_handler($action)
 		'group' => array('active' => 'groups', 'file' => 'group.php'),
 		'groupfields' => array('active' => 'groupfields', 'file' => 'groupfields.php'),
 		'ranks' => array('active' => 'ranks', 'file' => 'defaultranks.php'),
+		'otms' => array('active' => 'otms', 'file' => 'otms.php'),
 		'create' => array('active' => 'create', 'file' => 'creategroup.php')
 	);
 

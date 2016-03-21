@@ -334,8 +334,9 @@ class UserGroup {
           //Move threads to parent board
           $threadquery = $this->db->simple_select('threads', '*', 'fid = '.$this->info['fid']);
           while($thread = $this->db->fetch_array($threadquery)) {
-            $threadstring .= $thread['tid'];
+            $threadstring .= $thread['tid'].',';
           }
+          $threadstring = rtrim($threadstring, ',');
           if(!empty($threadstring)) {
             $this->db->update_query('threads', array('fid' => $forum['pid']), 'tid IN ('.$threadstring.')');
             $this->db->update_query('posts', array('fid' => $forum['pid']), 'tid IN ('.$threadstring.')');

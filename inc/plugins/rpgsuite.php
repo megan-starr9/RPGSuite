@@ -70,7 +70,8 @@ if (defined("IN_ADMINCP")) {
 	require_once MYBB_ROOT."inc/plugins/rpg_suite/functionality/onlinelist.php";
 	require_once MYBB_ROOT."inc/plugins/rpg_suite/functionality/forumdisplay.php";
 	require_once MYBB_ROOT."inc/plugins/rpg_suite/functionality/welcomewagon.php";
-		require_once MYBB_ROOT."inc/plugins/rpg_suite/functionality/lonelythreads.php";
+	require_once MYBB_ROOT."inc/plugins/rpg_suite/functionality/lonelythreads.php";
+	require_once MYBB_ROOT."inc/plugins/rpg_suite/functionality/otms.php";
 }
 
 // Load general files (used anywhere)

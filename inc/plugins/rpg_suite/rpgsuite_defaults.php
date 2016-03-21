@@ -24,7 +24,9 @@ class Accounts {
 }
 
 class Forums {
-  const STAFFCATEGORY = 79;
+  const NOREAD = array(79);
+  const MODTOOLS = array('1');
+  const READONLY = array(50);
 }
 
 class Stats {
@@ -40,7 +42,13 @@ class PointChance {
   const SPRINGSUMMER = 20;    // 20%
 }
 
-
+class OTMTypes {
+  const THREAD = 'thread';
+  const POST = 'post';
+  const USER = 'member';
+  const CHARACTER = 'character';
+  const GROUP = 'pack';
+}
 
 /** THESE LIKELY WON'T CHANGE **/
 
@@ -146,6 +154,32 @@ class Creation {
     'canpostpolls' => 0,
     'canvotepolls' => 0,
     'cansearch' => 0
+  );
+  /**
+  No Write Permissions (Guidebook, etc)
+  //Need set: fid, gid
+  */
+  const FORUM_PERM_NOWRITE = array(
+    'canview' => 1,
+    'canviewthreads' => 1,
+    'canonlyviewownthreads' => 0,
+    'candlattachments' => 1,
+    'canpostthreads' => 0,
+    'canpostreplys' => 0,
+    'canonlyreplyownthreads' => 0,
+    'canpostattachments' => 0,
+    'canratethreads' => 0,
+    'caneditposts' => 0,
+    'candeleteposts' => 0,
+    'candeletethreads' => 0,
+    'caneditattachments' => 0,
+    'modposts' => 0,
+    'modthreads' => 0,
+    'mod_edit_posts' => 0,
+    'modattachments' => 0,
+    'canpostpolls' => 0,
+    'canvotepolls' => 1,
+    'cansearch' => 1
   );
 
   /**
@@ -278,7 +312,7 @@ class Creation {
     'canviewips' => 0,
     'canviewunapprove' => 0,
     'canviewdeleted' => 1,
-    'canopenclosethreads' => 0,
+    'canopenclosethreads' => 1,
     'canstickunstickthreads' => 1,
     'canapproveunapprovethreads' => 0,
     'canapproveunapproveposts' => 0,
