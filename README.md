@@ -20,17 +20,30 @@ Basic roadmap
 
 
 Template Variables!
+
 --> header
+
 ------> OTM Display: {$otms}
+
 ------> Account Approval Notification: {$approvalalert}
+
 --> forumdisplay
+
 ------> Information Blurb for Owning Group: {$icforumdisplay}
+
 --> stats
+
 ------> Statistic Display: {$groupstats}
 
+
 Links once Installed
+
 --> New User Approval: http://mysite.com/index.php?action=activationqueue
+
 --> Group Management CP: http://mysite.com/modcp.php?action=managegroup
+
 --> Group Ranks: http://mysite.com/index.php?action=showranks
+
 --> Lonely Threads: http://mysite.com/misc.php?action=lonelythreads
+
 --> Threadlog: http://mysite.com/misc.php?action=threadlog
