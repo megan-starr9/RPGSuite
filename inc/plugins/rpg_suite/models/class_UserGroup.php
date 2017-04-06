@@ -97,6 +97,9 @@ class UserGroup {
       join_usergroup($user['uid'], $this->info['gid']);
 
       $updatearray = array('displaygroup' => $this->info['gid'], 'group_dateline' => time());
+      if($user['displaygroup'] == Groups::MEMBER) {
+        $updatearray['last_activated'] = time();
+      }
       $member->update_member($updatearray);
       $member->update_rank($this->info['defaultrank']);
     }
@@ -318,6 +321,8 @@ class UserGroup {
   Remove the group's forums from the game
   */
   public function remove_forums() {
+    $rpglib = new RPGSuite($this->mybb, $this->db, $this->cache);
+
     if($this->info['fid']) {
       $forumquery = $this->db->simple_select('forums', '*', 'fid = '.$this->info['fid']);
       while($forum = $this->db->fetch_array($forumquery)) {
@@ -341,6 +346,7 @@ class UserGroup {
             $this->db->update_query('threads', array('fid' => $forum['pid']), 'tid IN ('.$threadstring.')');
             $this->db->update_query('posts', array('fid' => $forum['pid']), 'tid IN ('.$threadstring.')');
             update_forum_lastpost($forum['pid']);
+            $rpglib->rebuild_forum_counts([$this->info['fid'], $forum['pid']]);
           }
       }
 

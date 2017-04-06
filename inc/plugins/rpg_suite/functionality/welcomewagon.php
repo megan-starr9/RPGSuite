@@ -18,14 +18,15 @@ require_once MYBB_ROOT."inc/datahandlers/pm.php";
  For sending welcome pm and placing in default usergroup on activation
  **/
 
-// On Join, send PM notifying that admin will approve and add to Awaiting Activation group
-$plugins->add_hook('member_do_register_end', 'pm_on_join');
-function pm_on_join() {
-  global $mybb, $db, $cache, $user_info, $lang;
+// When user is ready, send PM notifying that admin will approve and add to Awaiting Activation group
+function apply() {
+  global $mybb, $db, $cache, $lang;
   if($mybb->settings['rpgsuite_approval']) {
-    $user = new GroupMember($mybb, $db, $cache, $user_info);
+    $user = new GroupMember($mybb, $db, $cache, $mybb->user);
 
     $user->update_member(array('usergroup' => Groups::WAITING));
+
+    header('Location: '.$_SERVER['REQUEST_URI']);
 
     if(!empty($mybb->settings['rpgsuite_approval_registerpm'])) {
       $pm_handler = new PMDataHandler();
@@ -46,7 +47,7 @@ function pm_on_join() {
       } else {
          $pm_handler->insert_pm();
       }
-    }
+    } 
   }
 }
 
@@ -54,6 +55,11 @@ function pm_on_join() {
 // On approval, add to group and send PM
 function approve($userid, $username, $type) {
   global $mybb, $db, $cache, $lang;
+  $user = new GroupMember($mybb, $db, $cache);
+  $user->initialize($userid);
+
+  $user->update_member(array('usergroup' => Groups::MEMBER));
+
   //determine the group
   $gid = Groups::IC_DEFAULT;
   if(strpos($type,'Nonwolf') !== false) {
@@ -62,9 +68,9 @@ function approve($userid, $username, $type) {
   } else if(strpos($type,'Lurker') !== false) {
     // Character is Lurker
     $gid = Groups::LURKER;
-  } else if(strpos($type,'Adopt') !== false) {
-    // Character is adoptable
-    $gid = Groups::ADOPTABLE;
+  } else if(strpos($type,'Inactive') !== false) {
+    // Character is inactive reservation
+    $gid = Groups::MEMBER;
   }
   $group = new UserGroup($mybb, $db, $cache);
   $group->initialize($gid);
@@ -95,9 +101,11 @@ function approve($userid, $username, $type) {
 // On deny, simply add to default OOC group & send pm
 function deny($userid, $username) {
   global $mybb, $db, $cache;
-  $group = new UserGroup($mybb, $db, $cache);
-  $group->initialize(Groups::MEMBER);
-  $group->add_member($userid);
+
+  $user = new GroupMember($mybb, $db, $cache);
+  $user->initialize($userid);
+
+  $user->update_member(array('usergroup' => Groups::UNAPPROVED));
 
   if(!empty($mybb->settings['rpgsuite_approval_denypm'])) {
     $pm_handler = new PMDataHandler();
@@ -131,6 +139,10 @@ function display_queue() {
       $waiting_count = count($rpgsuite->get_awaiting_approval());
       if($waiting_count > 0) {
         eval("\$approvalalert = \"".$templates->get('rpgapprove_notification')."\";");
+      }
+    } else if($currentuser->get_info()['usergroup'] == Groups::UNAPPROVED) {
+      if(isset($mybb->input['apply'])) {
+        apply();
       }
     }
   }

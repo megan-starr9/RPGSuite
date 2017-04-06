@@ -35,11 +35,12 @@ class OtmAwards {
           GROUP BY email ORDER BY total DESC LIMIT ".$number.")";
 
     $userquery = "SELECT u.*, c.total FROM $countquery c INNER JOIN
-            (SELECT * FROM ".TABLE_PREFIX."users WHERE lastpost > $since AND as_uid = 0 ORDER BY uid ASC) u
-            ON c.email = u.email GROUP BY u.email ORDER BY total DESC LIMIT $number";
+            (SELECT * FROM ".TABLE_PREFIX."users u INNER JOIN ".TABLE_PREFIX."userfields f ON u.uid = f.ufid WHERE u.lastpost > $since AND u.as_uid = 0 ORDER BY ".Fields::OOC_NAME." DESC, uid ASC LIMIT 1) u
+            ON c.email = u.email ORDER BY total DESC LIMIT $number";
 
     $results = $this->db->query($userquery);
     while($user = $this->db->fetch_array($results)) {
+      $user['displayname'] = !empty($user[Fields::OOC_NAME]) ? $user[Fields::OOC_NAME] : $user['username'];
       $userarray[] = $user;
     }
     return $userarray;

@@ -11,7 +11,6 @@ function rpgsuite_install() {
   global $db;
   // Create Settings
   $settinggroup = array(
-      'gid'    => 'NULL',
       'name'  => 'rpgsuite',
       'title'      => 'RPG Suite',
       'description'    => 'Settings For RPG Suite',
@@ -71,6 +70,8 @@ function rpgsuite_activate() {
   // Add any tables for upgrading
   if(!$db->table_exists("otms"))
     $db->write_query("CREATE TABLE ".TABLE_PREFIX."otms (id int(11) NOT NULL AUTO_INCREMENT, name VARCHAR(500), type VARCHAR(100), value VARCHAR(2000), PRIMARY KEY(id))");
+  if (!$db->field_exists("last_activated", "users"))
+    $db->write_query("ALTER TABLE `".TABLE_PREFIX."users` ADD COLUMN `last_activated` BIGINT(30)");
 
   // If we have new settings, add them!
   $settinggroup = $db->simple_select('settinggroups','gid','name = \'rpgsuite\'');
@@ -112,9 +113,9 @@ function build_settings($gid) {
   require_once MYBB_ROOT."/inc/plugins/rpg_suite/rpgsuite_settings.php";
   $settingarray = array();
   $settings = settings();
+  $i = 0;
   foreach($settings as $setting) {
     $settingarray[] = array(
-      'sid'            => 'NULL',
       'name'        => 'rpgsuite_'.$setting['name'],
       'title'            => $setting['title'],
       'description'    => $setting['description'],
@@ -147,8 +148,9 @@ function create_tables() {
   $db->write_query("ALTER TABLE `".TABLE_PREFIX."users` ADD COLUMN `grouprank` INT(11) NOT NULL DEFAULT '0'");
   $db->write_query("ALTER TABLE `".TABLE_PREFIX."users` ADD COLUMN `grouprank_text` VARCHAR(100) NOT NULL DEFAULT ''");
   $db->write_query("ALTER TABLE `".TABLE_PREFIX."users` ADD COLUMN `group_dateline` BIGINT(30)");
+  $db->write_query("ALTER TABLE `".TABLE_PREFIX."users` ADD COLUMN `last_activated` BIGINT(30)");
 
-  wolf_specific_inserts();
+  //wolf_specific_inserts();
 }
 /**
 Delete any custom tables or columns
@@ -175,6 +177,8 @@ function destroy_tables() {
     $db->write_query("ALTER TABLE `".TABLE_PREFIX."users` DROP COLUMN `grouprank_text`");
   if ($db->field_exists("group_dateline", "users"))
     $db->write_query("ALTER TABLE `".TABLE_PREFIX."users` DROP COLUMN `group_dateline`");
+  if ($db->field_exists("last_activated", "users"))
+    $db->write_query("ALTER TABLE `".TABLE_PREFIX."users` DROP COLUMN `last_activated`");
 }
 
 /**

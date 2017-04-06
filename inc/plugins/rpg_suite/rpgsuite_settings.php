@@ -31,11 +31,25 @@ function settings() {
     'default'        => '14'
   );
   $settingarray[] = array(
+    'name'        => 'activitycheck_leaderperiod',
+    'title'            => 'Activity Check Period For Leader',
+    'description'    => 'If a post isn\'\'t made in this many days, demote the leader.',
+    'type'    => 'text',
+    'default'        => '7'
+  );
+  $settingarray[] = array(
     'name'        => 'activitycheck_absence',
     'title'            => 'Activity Check Absence Length',
-    'description'    => 'Max days a character can be on absence before activity checker ignores it.',
+    'description'    => 'Grace period to add on for characters on absence.',
     'type'    => 'text',
     'default'        => '30'
+  );
+  $settingarray[] = array(
+    'name'        => 'activitycheck_joingraceperiod',
+    'title'            => 'Activity Check Grace Period',
+    'description'    => 'Days after joining a group that a character is immune to the checker.',
+    'type'    => 'text',
+    'default'        => '7'
   );
   $settingarray[] = array(
     'name'        => 'grouppoints',
@@ -112,7 +126,7 @@ function settings() {
     'title'            => 'Approve Users?',
     'description'    => 'Replace the default activation with a separate user approval process (still utilizes the Awaiting Approval usergroup).',
     'type'    => 'yesno',
-    'default'        => '1'
+    'default'        => '0'
   );
   $settingarray[] = array(
     'name'        => 'approval_registerpm_subj',

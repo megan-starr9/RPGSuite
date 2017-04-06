@@ -118,7 +118,7 @@ class RPGSuite {
     }
 
     $threadquery = $this->db->simple_select('threads t INNER JOIN '.TABLE_PREFIX.'forums f ON t.fid = f.fid INNER JOIN '.TABLE_PREFIX.'threadprefixes p ON t.prefix = p.pid',
-          '*','f.active = 1 AND f.open = 1 AND f.icforum = 1 AND t.closed = 0 AND t.visible = 1 AND t.replies = 0'.$filter,
+          '*','f.active = 1 AND f.open = 1 AND f.icforum = 1 AND (t.closed = 0 OR t.closed = "") AND t.visible = 1 AND t.replies = 0'.$filter,
           array(
             "order_by" => 'dateline',
             "order_dir" => 'DESC'
@@ -310,15 +310,18 @@ class RPGSuite {
     $this->db->update_query('threadprefixes', array('forums' => $forums.$fid), 'pid = '.$settings['prefix']);
 
     //Move existing prefixed threads to new board
+    $count = 0;
     $threadquery = $this->db->simple_select('threads', '*', 'fid = '.$forum['pid'].' AND prefix = '.$settings['prefix']);
     while($thread = $this->db->fetch_array($threadquery)) {
       $threadstring .= $thread['tid'].',';
+      $count++;
     }
     $threadstring = rtrim($threadstring, ',');
     if(!empty($threadstring)) {
       $this->db->update_query('threads', array('fid' => $fid), 'tid IN ('.$threadstring.')');
       $this->db->update_query('posts', array('fid' => $fid), 'tid IN ('.$threadstring.')');
       update_forum_lastpost($fid);
+      $this->rebuild_forum_counts([$fid, $forum['pid']]);
     }
 
     // Setup moderator tools on IC forum
@@ -428,6 +431,29 @@ class RPGSuite {
   public function get_default_ranktable() {
     $usergroup = new UserGroup($this->mybb, $this->db, $this->cache, array('gid' => '0'));
     return $usergroup->get_ranks(1);
+  }
+
+  /**
+  Helper to set counts to proper values for forum
+  **/
+  public function rebuild_forum_counts($fids) {
+    foreach($fids as $fid) {
+      $posts = $this->db->query("select count(*) from ".TABLE_PREFIX."posts where fid=$fid and visible=1");
+      $postcount = $posts->fetch_row()[0];
+      $threads = $this->db->query("select count(*) from ".TABLE_PREFIX."threads where fid=$fid and visible=1");
+      $threadcount = $threads->fetch_row()[0];
+      $unapprovedposts = $this->db->query("select count(*) from ".TABLE_PREFIX."posts where fid=$fid and visible=0");
+      $unapprovedpostcount = $unapprovedposts->fetch_row()[0];
+      $unapprovedthreads = $this->db->query("select count(*) from ".TABLE_PREFIX."threads where fid=$fid and visible=0");
+      $unapprovedthreadcount = $unapprovedthreads->fetch_row()[0];
+      $deletedposts = $this->db->query("select count(*) from ".TABLE_PREFIX."posts where fid=$fid and visible=-1");
+      $deletedpostcount = $deletedposts->fetch_row()[0];
+      $deletedthreads = $this->db->query("select count(*) from ".TABLE_PREFIX."threads where fid=$fid and visible=-1");
+      $deletedthreadcount = $deletedthreads->fetch_row()[0];
+
+      $this->db->update_query('forums', array('posts' => $postcount, 'threads' => $threadcount, 'unapprovedposts' => $unapprovedpostcount, 'unapprovedthreads' => $unapprovedthreadcount,
+                                            'deletedposts' => $deletedpostcount, 'deletedthreads' => $deletedthreadcount), 'fid = '.$fid);
+    }
   }
 
 }

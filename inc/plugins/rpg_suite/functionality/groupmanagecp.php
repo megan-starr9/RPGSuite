@@ -214,8 +214,12 @@ function handle_form($usergroup) {
     }
   } else if(isset($mybb->input['member_add'])) {
     $membername = $db->escape_string($mybb->input['username']);
-    $usergroup->add_member_byname($membername);
-    $update = true;
+    $user = get_user_by_username($membername);
+    $userinfo = get_user($user['uid']);
+    if($userinfo['usergroup'] != Groups::UNAPPROVED && $userinfo['usergroup'] != Groups::WAITING) {
+      $usergroup->add_member_byname($membername);
+      $update = true;
+    }
   }
 
 

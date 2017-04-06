@@ -61,7 +61,7 @@ class ThreadlogSet extends TemplateSet {
     $templatearray[] = new Template('row',
     '<tr class="{$thread_status}"><td class="{$thread_row}">{$thread_prefix} {$thread_title}</td>
     <td class="{$thread_row}" align="center">{$thread_participants}</td>
-    <td class="{$thread_row}" align="center"><a href="javascript:MyBB.whoPosted({$thread['tid']});">{$thread[\'replies\']}</a></td>
+    <td class="{$thread_row}" align="center"><a href="javascript:MyBB.whoPosted({$tid});">{$thread[\'replies\']}</a></td>
     <td class="{$thread_row}" align="right">Last post by {$thread_latest_poster}<div class="smalltext">on {$thread_latest_date}</div></td></tr>');
 
     // Add Threadlog No Threads Bit

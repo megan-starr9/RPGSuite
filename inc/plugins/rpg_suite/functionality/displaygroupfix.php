@@ -56,6 +56,37 @@ function admin_approve_multiple_joins() {
     }
 }
 
+// Adding a user
+$plugins->add_hook('managegroup_do_add_start', 'add_to_usergroup');
+function add_to_usergroup() {
+  global $mybb;
+  $checkuser = get_user_by_username($mybb->get_input('username'), $options);
+  $check = get_user($checkuser['uid']);
+  if($check['usergroup'] == Groups::UNAPPROVED || $check['usergroup'] == Groups::WAITING) {
+    error('This user has not yet been approved');
+    exit;
+  }
+}
+
+// Inviting a user
+$plugins->add_hook('managegroup_do_invite_start', 'invite_to_usergroup');
+function invite_to_usergroup() {
+  global $mybb;
+  $checkuser = get_user_by_username($mybb->get_input('username'), $options);
+  $check = get_user($checkuser['uid']);
+  if($check['usergroup'] == Groups::UNAPPROVED || $check['usergroup'] == Groups::WAITING) {
+    error('This user has not yet been approved');
+    exit;
+  }
+}
+
+// User accepted invite
+$plugins->add_hook('usercp_usergroups_accept_invite', 'accept_invite_to_usergroup');
+function accept_invite_to_usergroup() {
+  global $mybb;
+  update_display_group($mybb->user['uid'], $mybb->get_input('acceptinvite', MyBB::INPUT_INT));
+}
+
 function update_display_group($uid, $gid) {
   global $mybb, $db, $cache;
 	$usergroup = new UserGroup($mybb,$db,$cache);

@@ -28,7 +28,7 @@ class OtmSet extends TemplateSet {
     </ul>');
 
     $templatearray[] = new Template('crazywriter',
-    '<li><b>{$user[\'username\']}</b> ($user[\'total\'])</li>');
+    '<li><b>{$user[\'username\']}</b> {$user[\'total\']}</li>');
 
     return $templatearray;
   }

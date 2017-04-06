@@ -14,8 +14,8 @@ For the group-specific statistics on the stats page!
 $plugins->add_hook("stats_start","groupstats_display");
 
 function groupstats_display() {
-  global $mybb, $db, $cache, $templates, $groupstats, $statlist, $maletot, $femaletot, $youthtot, $adulttot, $limitgroupcount;
-  $maletot = $femaletot = $youthtot = $adulttot = $overalltot = $limitgroupcount = 0;
+  global $mybb, $db, $cache, $templates, $groupstats, $statlist, $maletot, $femaletot, $packtot, $youthtot, $adulttot, $limitgroupcount;
+  $maletot = $femaletot = $youthtot = $adulttot = $packtot = $overalltot = $limitgroupcount = 0;
 
   $adultlimit = Stats::ADULTCAP;
   $youthlimit = Stats::YOUTHCAP;
@@ -29,13 +29,13 @@ function groupstats_display() {
   }
 
   $overalltot = $maletot + $femaletot;
-  $grouplimit = ceil($overalltot / $adultlimit);
+  $grouplimit = ceil($packtot / $adultlimit);
 
   eval("\$groupstats = \"".$templates->get('rpggroupstats_full')."\";");
 }
 
 function build_row($usergroup, $rowcount) {
-  global $templates, $statlist, $maletot, $femaletot, $youthtot, $adulttot, $limitgroupcount;
+  global $templates, $statlist, $maletot, $femaletot, $youthtot, $adulttot, $packtot, $limitgroupcount;
   $malecount = $femalecount = $youthcount = $adultcount = $totalcount = 0;
 
   $adultlimit = Stats::ADULTCAP;
@@ -109,6 +109,7 @@ function build_row($usergroup, $rowcount) {
   if($group['hasranks']) {
     eval("\$statlist .= \"".$templates->get('rpggroupstats_row_max')."\";");
     $limitgroupcount++;
+    $packtot += $adultcount;
   } else {
     eval("\$statlist .= \"".$templates->get('rpggroupstats_row_nomax')."\";");
   }

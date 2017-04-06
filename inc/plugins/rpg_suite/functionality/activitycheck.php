@@ -40,6 +40,9 @@ function run_activitycheck() {
       $user = $member->get_info();
       if(inactive($member)) {
         $group->hard_remove_member($user['uid']);
+      } else if(inactive_leader($member)) {
+        $group->demote_member($user['uid']);
+        $member->update_rank(0);
       }
     }
   }
@@ -51,8 +54,8 @@ Determines if player is inactive or not!
 function inactive($member) {
   global $mybb;
   $user = $member->get_info();
-  // Is player absent and has been less than specified days?
-  if($user['away'] && ($user['awaydate'] > time() - $mybb->settings['rpgsuite_activitycheck_absence'] * 86400)) {
+  // Check Join Grace Period
+  if($user['group_dateline'] > time() - ($mybb->settings['rpgsuite_activitycheck_joingraceperiod'] * 86400)) {
     return false;
   }
   // Should player be removed based on rank?
@@ -60,7 +63,51 @@ function inactive($member) {
   if($rank['ignoreactivitycheck']) {
     return false;
   }
-  // If neither of those, check posts
+  // If player is absent, add grace period (if set)
   $lastpost = $member->get_last_icpost();
+  if($user['away']) {
+    return ($lastpost['dateline'] < time() - ($mybb->settings['rpgsuite_activitycheck_absence'] + $mybb->settings['rpgsuite_activitycheck_period']) * 86400);
+  }
+  // If none of those, check posts
   return ($lastpost['dateline'] < time() - $mybb->settings['rpgsuite_activitycheck_period'] * 86400);
+}
+
+/**
+Determines if a leader has met their requirements
+*/
+function inactive_leader($member) {
+  global $mybb;
+  $user = $member->get_info();
+
+  if($member->is_leader()) {
+    if($user['group_dateline'] > time() - ($mybb->settings['rpgsuite_activitycheck_joingraceperiod'] * 86400)) {
+      return false;
+    }
+    $lastpost = $member->get_last_icpost();
+    if($user['away']) {
+      return ($lastpost['dateline'] < time() - ($mybb->settings['rpgsuite_activitycheck_absence'] + $mybb->settings['rpgsuite_activitycheck_leaderperiod']) * 86400);
+    }
+    return ($lastpost['dateline'] < time() - $mybb->settings['rpgsuite_activitycheck_leaderperiod'] * 86400);
+  }
+  return false;
+}
+
+/**
+Display check variables on profile to inform user
+**/
+$plugins->add_hook("member_profile_end","display_check");
+function display_check() {
+  global $mybb,$db,$cache,$next_activity_run,$memprofile,$time_to_removal,$time_to_demotion;
+
+  if($memprofile['uid'] == $mybb->user['uid']) {
+    $activitycheck = new Ticker($db, 1, $mybb->settings['rpgsuite_activitycheck_freq']);
+    $next_activity_run = $activitycheck->next_run();
+
+    $member = new GroupMember($mybb,$db,$cache);
+    $member->initialize($mybb->user['uid']);
+    $lastpost = $member->get_last_icpost();
+
+    $time_to_removal = floor((($lastpost['dateline'] + ($mybb->settings['rpgsuite_activitycheck_period'] * 86400)) - time()) / 86400);
+    $time_to_demotion = floor((($lastpost['dateline'] + ($mybb->settings['rpgsuite_activitycheck_leaderperiod'] * 86400)) - time()) / 86400);
+  }
 }

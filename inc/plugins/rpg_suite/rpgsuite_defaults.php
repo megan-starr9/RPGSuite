@@ -1,43 +1,44 @@
 <?php
 /** THESE LIKELY CHANGE SITE BY SITE **/
 class Fields {
-  const GENDER = 'fid6';
-  const BDATE = 'fid9';
+  const GENDER = 'fid6'; // Custom field id for gender
+  const BDATE = 'fid9'; // Custom field id for birthdate
   const AGE = 'fid8';     //Age is a backup in case birthdate is invalid date
   const GROUPPOINTS = 'fidx';
   const TYPE = 'fid38';   // Determines account type for default group on register/approval
+  const OOC_NAME = 'fid3'; // Custom field id for OOC name
 }
 
 class Groups {
+  const UNAPPROVED = 2; // IDs of user groups for specific member types
   const WAITING = 5;
-  const MEMBER = 2;
-  const ADMIN = 4;
-  const MOD = 6;
+  const MEMBER = 63;
   const IC_DEFAULT = 8;
   const WILDFAUNA = 9;
   const LURKER = 32;
-  const ADOPTABLE = 11;
+  const ADMIN = 4;
+  const MOD = 6;
 }
 
 class Accounts {
-  const ADMIN = 1;
+  const ADMIN = 1; // Main admin account (for sending PMs)
 }
 
 class Forums {
-  const NOREAD = array(79);
-  const MODTOOLS = array('1');
-  const READONLY = array(50);
+  const NOREAD = array(79); // IDs of forums that should never have read permission (staff)
+  const MODTOOLS = array('1'); // IDs of mod tools
+  const READONLY = array(50); // IDs of forums that should always be readonly (guidebook)
 }
 
 class Stats {
-  const YOUTHCAP = 6;
-  const ADULTCAP = 12;
-  const ADULTAGE = 9; // 9 months
-  const PERCENTAGE = 2/3; // percentage where color changes!
+  const YOUTHCAP = 8; // Max number of youth characters allowed per group
+  const ADULTCAP = 12; // Max number of adults allowed per group
+  const ADULTAGE = 9; // 9 months - age of youth to adult
+  const PERCENTAGE = 2/3; // percentage reached where color changes for warning
 }
 
 class PointChance {
-  const WINTER = 50;          // 50%
+  const WINTER = 50;          // 50% (not used!)
   const FALL = 35;            // 35%
   const SPRINGSUMMER = 20;    // 20%
 }
@@ -49,6 +50,8 @@ class OTMTypes {
   const CHARACTER = 'character';
   const GROUP = 'pack';
 }
+
+
 
 /** THESE LIKELY WON'T CHANGE **/
 
@@ -76,7 +79,9 @@ class Creation {
     'style' => 0,
     'overridestyle' => 0,
     'rulestype' => 1,
-    'icforum' => 1
+    'icforum' => 1,
+    'parentlist' => '',
+    'rules' => ''
   );
   /**
   OOC (Members Only) Forum Settings
@@ -100,7 +105,9 @@ class Creation {
     'style' => 0,
     'overridestyle' => 0,
     'rulestype' => 1,
-    'icforum' => 0
+    'icforum' => 0,
+    'parentlist' => '',
+    'rules' => ''
   );
 
   /**
@@ -187,7 +194,7 @@ class Creation {
   //Need set: title, description, namestyle, image
   */
   const USERGROUP = array(
-    'type' => 4,
+    'type' => 2,
     'stars' => 0,
     'disporder' => 0,
     'isbannedgroup' => 0,
@@ -293,7 +300,7 @@ class Creation {
   const GROUPLEADER = array(
     'canmanagemembers' => 1,
     'canmanagerequests' => 1,
-    'caninvitemembers' => 0
+    'caninvitemembers' => 1
   );
 
   /**
